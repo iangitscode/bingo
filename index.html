@@ -176,7 +176,7 @@
 
         .modal-content button {
             padding: 14px 28px;
-            background-color: #667eea;
+            background-color: #eb2e21;
             color: white;
             border: none;
             border-radius: 8px;
@@ -190,6 +190,10 @@
 
         .modal-content button:active {
             background-color: #764ba2;
+        }
+
+        #resetButton {
+            display: none;
         }
 
     </style>
@@ -350,6 +354,7 @@
 
         // Load game state
         function loadGame() {
+            document.getElementById('resetButton').style.display = 'block';
             document.getElementById('playerName').textContent = `Player: ${playerName}`;
             
             // Load crossed squares from localStorage
