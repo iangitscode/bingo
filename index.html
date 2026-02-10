@@ -197,7 +197,8 @@
             }
 
             h1 {
-                font-size: 32px;
+                font-size: 48px;
+                font: bold;
                 margin-bottom: 10px;
             }
 
@@ -330,7 +331,16 @@
         function generateBoard(name) {
             const seed = hashCode(name);
             const shuffled = seededShuffle(bingoPhrases, seed);
-            return shuffled.slice(0, 25);
+            const board = shuffled.slice(0, 25);
+            
+            // Always put "Free Space" in the center (index 12)
+            const freeSpaceIndex = board.indexOf("Free Space");
+            if (freeSpaceIndex !== -1 && freeSpaceIndex !== 12) {
+                // Swap "Free Space" with whatever is at position 12
+                [board[12], board[freeSpaceIndex]] = [board[freeSpaceIndex], board[12]];
+            }
+            
+            return board;
         }
 
         // Initialize the game
@@ -384,13 +394,17 @@
 
         // Load game state
         function loadGame() {
-            document.getElementById('playerName').textContent = `${playerName}`;
+            document.getElementById('playerName').textContent = `Player: ${playerName}`;
             
             // Load crossed squares from localStorage
             const storedCrossed = localStorage.getItem('crossedSquares');
             if (storedCrossed) {
                 crossedSquares = new Set(JSON.parse(storedCrossed));
             }
+            
+            // Always mark center square (index 12) as crossed
+            crossedSquares.add(12);
+            localStorage.setItem('crossedSquares', JSON.stringify([...crossedSquares]));
             
             createBoard();
         }
@@ -428,6 +442,11 @@
 
         // Toggle square crossed state
         function toggleSquare(index, element) {
+            // Prevent toggling the center free space
+            if (index === 12) {
+                return;
+            }
+            
             if (crossedSquares.has(index)) {
                 crossedSquares.delete(index);
                 element.classList.remove('crossed');
