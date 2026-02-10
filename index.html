@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bingo Board</title>
+    <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px;
+            box-sizing: border-box;
+            touch-action: manipulation;
+        }
+
+        h1 {
+            color: white;
+            margin: 10px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-size: 24px;
+            text-align: center;
+        }
+
+        #playerName {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        #bingoBoard {
+            background: white;
+            border-collapse: collapse;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border-radius: 8px;
+            overflow: hidden;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        td {
+            width: 20%;
+            height: 0;
+            padding-bottom: 20%;
+            border: 1.5px solid #667eea;
+            text-align: center;
+            vertical-align: middle;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            position: relative;
+            font-size: 11px;
+            font-weight: 500;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        td > div {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            word-wrap: break-word;
+            overflow: hidden;
+            line-height: 1.2;
+        }
+
+        td:active {
+            background-color: #f0f0f0;
+        }
+
+        td.crossed {
+            background-color: #667eea;
+            color: white;
+        }
+
+        td.crossed > div {
+            text-decoration: line-through;
+        }
+
+        td.crossed::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 32px;
+            font-weight: bold;
+            color: white;
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        #resetButton {
+            margin-top: 20px;
+            padding: 8px 16px;
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #667eea;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+            touch-action: manipulation;
+            min-height: 36px;
+        }
+
+        #resetButton:active {
+            transform: scale(0.95);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 25px;
+            border-radius: 12px;
+            width: 85%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .modal-content h2 {
+            color: #667eea;
+            margin-top: 0;
+            font-size: 22px;
+        }
+
+        .modal-content p {
+            font-size: 16px;
+            color: #333;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 14px;
+            margin: 20px 0;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            touch-action: manipulation;
+        }
+
+        .modal-content button {
+            padding: 14px 28px;
+            background-color: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            min-height: 48px;
+            touch-action: manipulation;
+            width: 100%;
+        }
+
+        .modal-content button:active {
+            background-color: #764ba2;
+        }
+
+        /* Desktop styles */
+        @media (min-width: 768px) {
+            body {
+                justify-content: center;
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 32px;
+                margin-bottom: 10px;
+            }
+
+            #playerName {
+                font-size: 18px;
+                margin-bottom: 20px;
+            }
+
+            #bingoBoard {
+                max-width: 600px;
+            }
+
+            td {
+                font-size: 13px;
+            }
+
+            td > div {
+                padding: 8px;
+            }
+
+            td:hover {
+                background-color: #f0f0f0;
+            }
+
+            td.crossed::after {
+                font-size: 40px;
+            }
+
+            #resetButton:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+            }
+
+            .modal-content button:hover {
+                background-color: #764ba2;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1 id="playerName"></h1>
+    <table id="bingoBoard"></table>
+    <button id="resetButton">Reset Board</button>
+
+    <div id="nameModal" class="modal">
+        <div class="modal-content">
+            <h2>Welcome to Bingo!</h2>
+            <p>Please enter your name to get started:</p>
+            <input type="text" id="nameInput" placeholder="Your name" />
+            <button id="submitName">Start Playing</button>
+        </div>
+    </div>
+
+    <script>
+        // Array of bingo phrases
+        const bingoPhrases = [
+            "Free Space",
+            "Coffee break",
+            "Monday blues",
+            "Can you hear me?",
+            "Technical difficulties",
+            "Let's circle back",
+            "Synergy",
+            "Low-hanging fruit",
+            "Think outside the box",
+            "Touch base",
+            "Bandwidth",
+            "Deep dive",
+            "Move the needle",
+            "Best practices",
+            "Paradigm shift",
+            "Win-win",
+            "Game changer",
+            "Take it offline",
+            "Run it up the flagpole",
+            "Leverage",
+            "Action items",
+            "Ping me",
+            "Loop in",
+            "Drill down",
+            "At the end of the day",
+            "On my radar",
+            "Circle back around",
+            "Take this to the next level",
+            "Net-net",
+            "Quick win",
+            "Push the envelope",
+            "Boil the ocean",
+            "Drink the Kool-Aid",
+            "Boots on the ground",
+            "Get the ball rolling",
+            "Back to the drawing board",
+            "Throw under the bus",
+            "Hit the ground running",
+            "Keep me in the loop",
+            "Bring to the table"
+        ];
+
+        let playerName = '';
+        let crossedSquares = new Set();
+
+        // Simple hash function to convert string to number
+        function hashCode(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash; // Convert to 32bit integer
+            }
+            return Math.abs(hash);
+        }
+
+        // Deterministic shuffle based on seed
+        function seededShuffle(array, seed) {
+            const shuffled = [...array];
+            let currentSeed = seed;
+            
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                // Generate pseudo-random number using seed
+                currentSeed = (currentSeed * 9301 + 49297) % 233280;
+                const rnd = currentSeed / 233280;
+                const j = Math.floor(rnd * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            
+            return shuffled;
+        }
+
+        // Generate board based on player name
+        function generateBoard(name) {
+            const seed = hashCode(name);
+            const shuffled = seededShuffle(bingoPhrases, seed);
+            return shuffled.slice(0, 25);
+        }
+
+        // Initialize the game
+        function initGame() {
+            // Check for stored name
+            const storedName = localStorage.getItem('name');
+            
+            if (storedName) {
+                playerName = storedName;
+                loadGame();
+            } else {
+                showNameModal();
+            }
+        }
+
+        // Show modal to get player name
+        function showNameModal() {
+            const modal = document.getElementById('nameModal');
+            modal.style.display = 'flex';
+            
+            const input = document.getElementById('nameInput');
+            const submitBtn = document.getElementById('submitName');
+            
+            // Small delay to ensure keyboard doesn't interfere on mobile
+            setTimeout(() => input.focus(), 100);
+            
+            // Handle enter key
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    submitName();
+                }
+            });
+            
+            submitBtn.addEventListener('click', submitName);
+        }
+
+        // Submit player name
+        function submitName() {
+            const input = document.getElementById('nameInput');
+            const name = input.value.trim();
+            
+            if (name) {
+                playerName = name;
+                localStorage.setItem('name', name);
+                document.getElementById('nameModal').style.display = 'none';
+                loadGame();
+            } else {
+                alert('Please enter a valid name!');
+            }
+        }
+
+        // Load game state
+        function loadGame() {
+            document.getElementById('playerName').textContent = `${playerName}`;
+            
+            // Load crossed squares from localStorage
+            const storedCrossed = localStorage.getItem('crossedSquares');
+            if (storedCrossed) {
+                crossedSquares = new Set(JSON.parse(storedCrossed));
+            }
+            
+            createBoard();
+        }
+
+        // Create the bingo board
+        function createBoard() {
+            const board = document.getElementById('bingoBoard');
+            board.innerHTML = '';
+            
+            const phrases = generateBoard(playerName);
+            
+            for (let row = 0; row < 5; row++) {
+                const tr = document.createElement('tr');
+                
+                for (let col = 0; col < 5; col++) {
+                    const td = document.createElement('td');
+                    const div = document.createElement('div');
+                    const index = row * 5 + col;
+                    
+                    div.textContent = phrases[index];
+                    td.appendChild(div);
+                    td.dataset.index = index;
+                    
+                    if (crossedSquares.has(index)) {
+                        td.classList.add('crossed');
+                    }
+                    
+                    td.addEventListener('click', () => toggleSquare(index, td));
+                    tr.appendChild(td);
+                }
+                
+                board.appendChild(tr);
+            }
+        }
+
+        // Toggle square crossed state
+        function toggleSquare(index, element) {
+            if (crossedSquares.has(index)) {
+                crossedSquares.delete(index);
+                element.classList.remove('crossed');
+            } else {
+                crossedSquares.add(index);
+                element.classList.add('crossed');
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('crossedSquares', JSON.stringify([...crossedSquares]));
+        }
+
+        // Reset board
+        document.getElementById('resetButton').addEventListener('click', () => {
+            if (confirm('Are you sure you want to reset everything? This will clear your name and all crossed squares.')) {
+                localStorage.clear();
+                location.reload();
+            }
+        });
+
+        // Start the game
+        initGame();
+    </script>
+</body>
+</html>
