@@ -196,6 +196,49 @@
             display: none;
         }
 
+        @media (min-width: 1300px) {
+            body {
+                justify-content: center;
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 48px;
+                font: bold;
+                margin-bottom: 10px;
+            }
+
+            #playerName {
+                font-size: 18px;
+                margin-bottom: 20px;
+            }
+
+            #bingoBoard {
+                max-width: 600px;
+            }
+
+            td {
+                font-size: 13px;
+            }
+
+            td > div {
+                padding: 8px;
+            }
+
+            td.crossed::after {
+                font-size: 40px;
+            }
+
+            #resetButton:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+            }
+
+            .modal-content button:hover {
+                background-color: #764ba2;
+            }
+        }
+
     </style>
 </head>
 <body>
